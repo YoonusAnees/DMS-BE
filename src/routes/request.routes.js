@@ -6,7 +6,7 @@ const auth = require("../middleware/auth");
 router.post("/", createRequest);
 
 // Admin only
-router.get("/", auth, getAllRequests);
+router.get("/", getAllRequests);
 router.put("/:id", auth, updateStatus);
 
 module.exports = router;

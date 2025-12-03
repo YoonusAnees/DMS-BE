@@ -10,7 +10,6 @@ exports.createRequest = async (req, res) => {
   }
 };
 
-// Admin: get all requests
 exports.getAllRequests = async (req, res) => {
   try {
     const requests = await Request.find().sort({ createdAt: -1 });

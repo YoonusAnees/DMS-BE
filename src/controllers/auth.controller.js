@@ -35,7 +35,6 @@ exports.registerAdmin = async (req, res) => {
 exports.loginAdmin = async (req, res) => {
   try {
     const { username, password } = req.body;
-
     const admin = await Admin.findOne({ username });
     if (!admin) return res.status(400).json({ message: "Invalid credentials" });
 
@@ -44,8 +43,31 @@ exports.loginAdmin = async (req, res) => {
 
     const token = generateToken(admin._id);
 
-    res.json({ token });
+    // Cookie safe for dev + prod
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      maxAge: 30 * 60 * 1000
+    });
+
+    res.json({
+      message: "Login successful",
+      admin: { id: admin._id, username: admin.username }
+    });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+
+exports.logoutAdmin = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+  });
+
+  res.json({ message: "Logged out successfully" });
 };
